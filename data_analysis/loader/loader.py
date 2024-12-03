@@ -1,7 +1,7 @@
 import pandas as pd
 import logging
 import logging.config
-from pytrends.request import TrendReq
+
 
 class WeatherLoader:
     def __init__(self, timeframe='today 12-m', config_path='configs/logging.conf'):

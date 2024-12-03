@@ -2,7 +2,7 @@ import logging
 import logging.config
 import threading
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import openpyxl
 from openpyxl.reader.excel import load_workbook
@@ -64,9 +64,8 @@ class RealtimeMonitoringService:
             time.sleep(5)
 
     def load_and_analyze(self):
-        start = datetime(2015, 1, self.day)
-        end = datetime(2015, 1, self.day+5)
-        self.day += 1
+        end = datetime(2015, 1, 15)
+        start = end - timedelta(days=5)
 
         # Create Point for Vancouver, BC
        # vancouver = Point(self.coords[0], self.coords[1])
@@ -88,12 +87,14 @@ class RealtimeMonitoringService:
                 data = data.infer_objects(copy=False)
                 data.reset_index(inplace=True)
                 print(self.coords)
+                
 
                 #Analisis
-                pymeteo.moving_average(2)
+                #pymeteo.moving_average(2)
                 pymeteo.calculate_difference(1)
                 pymeteo.autocorrelation(1, 2)
-                pymeteo.find_extrema()
+                pymeteo.find_max(3)
+                pymeteo.find_min(3)
                 self.save_result_to_file(pymeteo.get_data())
                 #self.append_dataframe_to_excel(pymeteo.get_data(), 'data.xlsx', 'Sheet1')
                # pymeteo.get_data().to_excel('data.xlsx', index=False)
