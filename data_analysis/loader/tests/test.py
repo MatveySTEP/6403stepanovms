@@ -1,6 +1,6 @@
 import unittest
 import pandas as pd
-from ..module.weather_code import WeatherData
+from data_analysis.loader.module import WeatherData
 
 
 class TestWeatherData(unittest.TestCase):

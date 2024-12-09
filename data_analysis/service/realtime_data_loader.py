@@ -5,13 +5,9 @@ import time
 from datetime import datetime, timedelta
 
 import openpyxl
-from openpyxl.reader.excel import load_workbook
-from openpyxl.workbook import Workbook
-import pandas as pd
 #from analysis.search_trends_analysis.analysis import TimeSeriesAnalysis
-from meteostat import Point, Daily, Stations
-from data_analysis.module.data_saver import save_to_excel
-from data_analysis.module.weather_code import WeatherData
+from meteostat import Daily, Stations
+from data_analysis.loader.module.analyze import DataAnalyzer
 
 
 class RealtimeMonitoringService:
@@ -78,7 +74,7 @@ class RealtimeMonitoringService:
         # Get daily data for 2018
         data = Daily(vancouver, start, end)
         data = data.fetch()
-        pymeteo = WeatherData(data)
+        pymeteo = DataAnalyzer(data)
         try:
             data = pymeteo.get_data()
 
@@ -101,12 +97,11 @@ class RealtimeMonitoringService:
 
                 self.logger.info(f"Service {self.service_id}: Analysis results saved to file.")
             else:
-                self.logger.warning(f"Service {self.service_id}: No data received from Google Trends.")
+                self.logger.warning(f"Service {self.service_id}: No data received from Meteostat.")
         except Exception as e:
             self.logger.exception(f"Service {self.service_id}: Error during data loading: {e}")
 
     import pandas as pd
-    import openpyxl
 
     def append_dataframe_to_excel(self, df: pd.DataFrame, filename: str, sheet_name: str = 'Sheet1') -> None:
         """

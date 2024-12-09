@@ -2,7 +2,7 @@ import time
 
 from data_analysis.service.realtime_data_loader import RealtimeMonitoringService
 
-service = RealtimeMonitoringService(1, [], 1000, '../configs/logging.conf')
+service = RealtimeMonitoringService(1, [], 1000, 'configs/logging.conf')
 service.start()
 
 print("Введите сообщение (для выхода введите 'exit' или 'quit'):")
@@ -17,6 +17,7 @@ while True:
         service.stop()
         break
     if message.lower() in cities:
+        print(f"Получено сообщение: {cities[message.lower()]}")
         service.set_coords(cities[message.lower()])
     # Выводим сообщение на экран
     print(f"Получено сообщение: {message}")

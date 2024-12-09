@@ -1,10 +1,12 @@
+import logging
+
 import numpy as np
 import pandas as pd
 
-from data_analysis.module.check_data_types import type_check
+from data_analysis.loader.module.check_data_types import type_check
 
 
-class WeatherData:
+class DataAnalyzer:
     """
     Класс для работы с погодными данными.
 
@@ -21,6 +23,7 @@ class WeatherData:
             data (pd.DataFrame): Данные о погоде.
         """
         self.data = data
+        self.logger = logging.getLogger(f"loader")
 
     def get_data(self) -> pd.DataFrame:
         """
@@ -51,6 +54,7 @@ class WeatherData:
         """
         max_column = f'max_{window}'
         self.data[max_column] = self.data['tavg'].rolling(window=window).max()
+        self.logger.debug(f"Analysis found maxima")
 
     def find_min(self, window: int) -> None:
         """
@@ -61,6 +65,8 @@ class WeatherData:
         """
         max_column = f'min_{window}'
         self.data[max_column] = self.data['tavg'].rolling(window=window).min()
+        self.logger.info(f"Analysis found min")
+
     @type_check((int,))
     def moving_average(self, window: int) -> None:
         """
@@ -71,11 +77,8 @@ class WeatherData:
         """
         ma_column = f'moving_average_{window}'
         self.data[ma_column] = self.data['tavg'].rolling(window=window).mean()
-    # def moving_average(self, window_size: int = 3) -> pd.Series:
-    #     """Вычисляет скользящее среднее для временного ряда с заданным размером окна."""
-    #     moving_average = [np.nan] * (window_size - 1)
-    #     moving_average.extend(self.data.rolling(window=window_size).mean()[window_size - 1:])
-    #     return pd.Series(moving_average)
+        self.logger.info(f"Analysis found moving average")
+
 
     def calculate_difference(self, window: int = 3) -> None:
         """
@@ -88,6 +91,8 @@ class WeatherData:
         if ma_column not in self.data:
             self.moving_average(window)
         self.data['temperature_difference'] = self.data[ma_column].diff()
+        self.logger.info(f"Analysis found difference")
+
 
     @type_check((int, int,))
     def autocorrelation(self, lag: int, window: int) -> None:
@@ -103,6 +108,7 @@ class WeatherData:
             self.moving_average(window)
         autocorr_value = self.data[ma_column].autocorr(lag)
         self.data[f'autocorrelation_lag_{lag}'] = autocorr_value
+        self.logger.info(f"Analysis found autocorr")
 
     @type_check((int,))
     # def find_extrema(self, window: int = 3) -> pd.Series:
@@ -132,6 +138,7 @@ class WeatherData:
         )
         minima.append(np.nan)
         self.logger.info(f"Analysis found minima")
+
         return minima
 
 
