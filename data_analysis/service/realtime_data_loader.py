@@ -8,6 +8,7 @@ import openpyxl
 #from analysis.search_trends_analysis.analysis import TimeSeriesAnalysis
 from meteostat import Daily, Stations
 from data_analysis.loader.module.analyze import DataAnalyzer
+from data_analysis.loader.module.loader import DataLoader
 
 
 class RealtimeMonitoringService:
@@ -17,22 +18,12 @@ class RealtimeMonitoringService:
         self.timeframe = timeframe
         self.stop_event = threading.Event()
         self.thread = None
+        self.loader = DataLoader([49.2497, -123.1193])
         logging.config.fileConfig(config_path)
         self.logger = logging.getLogger(f"service_{self.service_id}")
-        self.coords = [49.2497, -123.1193]
-        self.day = 1
-        # start = datetime(2015, 1, 1)
-        # end = datetime(2018, 12, 31)
-        #
-        # # Create Point for Vancouver, BC
-        # vancouver = Point(49.2497, -123.1193, 70)
-        #
-        # # Get daily data for 2018
-        # data = Daily(vancouver, start, end)
-        # data = data.fetch()
-        # self.pymeteo = WeatherData(data)
+
     def set_coords(self, coords):
-        self.coords = coords
+        self.loader.set_coords(coords)
 
     def start(self):
         if self.thread is None or not self.thread.is_alive():
@@ -60,20 +51,9 @@ class RealtimeMonitoringService:
             time.sleep(5)
 
     def load_and_analyze(self):
-        end = datetime(2015, 1, 15)
-        start = end - timedelta(days=5)
-
-        # Create Point for Vancouver, BC
-       # vancouver = Point(self.coords[0], self.coords[1])
-
-        stations = Stations()
-        stations = stations.nearby(self.coords[0], self.coords[1])
-        #vancouver = stations.region('CA', 'ON')
-        vancouver = stations.fetch(1)
-
         # Get daily data for 2018
-        data = Daily(vancouver, start, end)
-        data = data.fetch()
+        self.loader.refresh()
+        data = self.loader.get_data()
         pymeteo = DataAnalyzer(data)
         try:
             data = pymeteo.get_data()
@@ -91,7 +71,7 @@ class RealtimeMonitoringService:
                 pymeteo.autocorrelation(1, 2)
                 pymeteo.find_max(3)
                 pymeteo.find_min(3)
-                self.save_result_to_file(pymeteo.get_data())
+                # self.save_result_to_file(pymeteo.get_data())
                 #self.append_dataframe_to_excel(pymeteo.get_data(), 'data.xlsx', 'Sheet1')
                # pymeteo.get_data().to_excel('data.xlsx', index=False)
 
