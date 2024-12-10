@@ -77,7 +77,7 @@ class DataAnalyzer:
         """
         ma_column = f'moving_average_{window}'
         self.data[ma_column] = self.data['tavg'].rolling(window=window).mean()
-        self.logger.info(f"Analysis found moving average")
+        self.logger.debug(f"Analysis found moving average")
 
 
     def calculate_difference(self, window: int = 3) -> None:

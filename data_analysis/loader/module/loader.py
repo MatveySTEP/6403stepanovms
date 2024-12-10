@@ -2,7 +2,8 @@ import logging
 from datetime import datetime
 import datetime as dt
 
-from meteostat import Daily
+from meteostat import Daily, Stations
+
 
 class DataLoader:
     def __init__(self, coords: []):
@@ -10,17 +11,21 @@ class DataLoader:
         self.coords = coords
 
     def refresh(self):
+        start = datetime(2015, 1, 10)
         end = datetime(2015, 1, 15)
-        start = end - dt.timedelta(days=5)
 
-        data = Daily(self.coords, start, end)
+        stations = Stations()
+        stations = stations.nearby(self.coords[0], self.coords[1])
+        # vancouver = stations.region('CA', 'ON')
+        vancouver = stations.fetch(1)
+        data = Daily(vancouver, start, end)
         try:
             self.data = data.fetch()
         except:
             self.logger.error("could not fetch data")
             return
 
-        self.logger.info(f"refreshed data from {start} to {end}")
+        self.logger.debug(f"refreshed data from {start} to {end}")
 
     def set_coords(self, coords: []) -> None:
         self.logger.info("updated coordinates")

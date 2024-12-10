@@ -5,6 +5,7 @@ import time
 from datetime import datetime, timedelta
 
 import openpyxl
+import pandas as pd
 #from analysis.search_trends_analysis.analysis import TimeSeriesAnalysis
 from meteostat import Daily, Stations
 from data_analysis.loader.module.analyze import DataAnalyzer
@@ -62,8 +63,6 @@ class RealtimeMonitoringService:
                 pass
                 data = data.infer_objects(copy=False)
                 data.reset_index(inplace=True)
-                print(self.coords)
-                
 
                 #Analisis
                 #pymeteo.moving_average(2)
@@ -71,11 +70,11 @@ class RealtimeMonitoringService:
                 pymeteo.autocorrelation(1, 2)
                 pymeteo.find_max(3)
                 pymeteo.find_min(3)
-                # self.save_result_to_file(pymeteo.get_data())
+                self.save_result_to_file(pymeteo.get_data())
                 #self.append_dataframe_to_excel(pymeteo.get_data(), 'data.xlsx', 'Sheet1')
                # pymeteo.get_data().to_excel('data.xlsx', index=False)
 
-                self.logger.info(f"Service {self.service_id}: Analysis results saved to file.")
+                self.logger.debug(f"Service {self.service_id}: Analysis results saved to file.")
             else:
                 self.logger.warning(f"Service {self.service_id}: No data received from Meteostat.")
         except Exception as e:
